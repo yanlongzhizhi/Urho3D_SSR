@@ -1,0 +1,36 @@
+<renderpath>
+    <rendertarget name="position" sizedivisor="1 1" format="rgba16f" />
+    <rendertarget name="normal" sizedivisor="1 1" format="rgba" />
+    <rendertarget name="depth" sizedivisor="1 1" format="lineardepth" />
+    
+    <command type="clear" color="1 1 1 1" output="position"/>
+    <command type="clear" color="1 1 1 1" depth="1.0" output="depth" />
+    <command type="clear" color="0 0 0 0" depth="1.0" output="normal" />
+    <command type="clear" color="fog" depth="1.0" stencil="0" />
+    
+    <command type="scenepass" pass="deferred" marktostencil="true" vertexlights="true" metadata="gbuffer">
+        <output index="0" name="viewport" />
+        <output index="1" name="position" />
+        <output index="2" name="normal" />
+        <output index="3" name="depth" />
+    </command>
+    
+    <command type="scenepass" pass="postopaque" />
+    <command type="scenepass" pass="refract">
+        <texture unit="environment" name="viewport" />
+    </command>
+    <command type="scenepass" pass="alpha" vertexlights="true" sort="backtofront" metadata="alpha" />
+    <command type="scenepass" pass="postalpha" sort="backtofront" />
+        
+    <command type="quad" tag="SSR" enabled="true" vs="SSR" ps="SSR" output="viewport">
+        <texture unit="diffuse" name="viewport" />
+        <texture unit="normal" name="normal" />
+        <texture unit="specular" name="position" />
+        <texture unit="depth" name="depth" />
+        <parameter name="SSRStep" value="0.1" />
+        <parameter name="SSRMaxSteps" value="64.0" />
+        <parameter name="SSRReflectionFalloff" value="0.01" />
+        <parameter name="SSRNumBinarySearchSteps" value="16.0" />
+    </command>
+    		
+</renderpath>
